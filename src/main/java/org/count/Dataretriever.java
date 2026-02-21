@@ -50,4 +50,29 @@ public class Dataretriever {
             throw new RuntimeException(e);
         }
     }
+
+    List<CandidateVoteCount> countValidVotesByCandidate() {
+        List<CandidateVoteCount> candidateVoteCounts = new ArrayList<>();
+
+        try (Connection conn = connection.getConnection()) {
+            PreparedStatement ps = conn.prepareStatement("""
+                select candidate.name, count(vote.id) as valid_vote from candidate
+                    left join vote on candidate.id = vote.candidate_id
+                    and vote.vote_type = 'VALID'
+                group by candidate.name;
+                """);
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                CandidateVoteCount candidateVoteCount = new CandidateVoteCount();
+                candidateVoteCount.setCandidateName(rs.getString("name"));
+                candidateVoteCount.setValidVoteCount(rs.getString("valid_vote"));
+
+                candidateVoteCounts.add(candidateVoteCount);
+            }
+            return candidateVoteCounts;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
