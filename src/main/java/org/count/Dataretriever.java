@@ -101,4 +101,25 @@ public class Dataretriever {
             throw new RuntimeException(e);
         }
     }
+
+    double computeTurnoutRate() {
+
+        try ( Connection conn = connection.getConnection()) {
+            PreparedStatement ps = conn.prepareStatement("""
+                    select 
+                        (count(distinct vote.voter_id) * 100.0 / count(distinct voter.id)) as taux_participation
+                    from voter
+                    left join vote
+                    on voter.id = vote.voter_id;""");
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                return rs.getDouble("taux_participation");
+            }
+            throw new RuntimeException("Error to compute turnout rate");
+        }
+        catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
