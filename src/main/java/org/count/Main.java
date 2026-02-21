@@ -7,6 +7,7 @@ public class Main {
 
         Dataretriever retriever = new Dataretriever();
 
-        System.out.println(retriever.countAllVotes());
+//        System.out.println("totalVotes : "+retriever.countAllVotes());
+        System.out.println(retriever.countVotesByType());
         }
 }
