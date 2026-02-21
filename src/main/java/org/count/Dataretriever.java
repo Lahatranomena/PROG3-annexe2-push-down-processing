@@ -75,4 +75,30 @@ public class Dataretriever {
             throw new RuntimeException(e);
         }
     }
+
+    VoteSummary computeVoteSummary() {
+
+        try (Connection conn = connection.getConnection()) {
+            PreparedStatement ps = conn.prepareStatement("""
+                select
+                    sum(case when vote_type = 'VALID' then 1 else 0 end) as valid,
+                    sum(case when vote_type = 'BLANK' then 1 else 0 end) as blank,
+                    sum(case when vote_type = 'NULL' then 1 else 0 end) as null
+                from vote;""");
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                VoteSummary voteSummary = new VoteSummary();
+                voteSummary.setValidCount(rs.getInt("valid"));
+                voteSummary.setBlankCount(rs.getInt("blank"));
+                voteSummary.setNullCount(rs.getInt("null"));
+
+                return voteSummary;
+            }
+            throw new RuntimeException("Error to compute vote summary");
+        }
+        catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
