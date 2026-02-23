@@ -122,4 +122,32 @@ public class Dataretriever {
             throw new RuntimeException(e);
         }
     }
+
+    ElectionResult findWinner() {
+
+        try (Connection conn = connection.getConnection()) {
+            PreparedStatement ps = conn.prepareStatement("""
+                   SELECT candidate.name AS candidate_name, COUNT(v.id) AS valid_vote_count
+                   FROM vote v
+                            JOIN candidate ON v.candidate_id = candidate.id
+                   WHERE v.vote_type = 'VALID'
+                   GROUP BY candidate.id, candidate.name
+                   ORDER BY valid_vote_count DESC
+                   LIMIT 1;
+                    """);
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                ElectionResult electionResult = new ElectionResult();
+                electionResult.setCandidateName(rs.getString("candidate_name"));
+                electionResult.setValidVoteCount(rs.getInt("valid_vote_count"));
+
+                return electionResult;
+            }
+            throw new RuntimeException("Error to find winner");
+        }
+        catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
