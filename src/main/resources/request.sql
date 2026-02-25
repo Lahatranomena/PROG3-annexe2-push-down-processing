@@ -1,0 +1,1 @@
+--select count(case when vote_type = 'VALID' then 1 end)

@@ -81,9 +81,9 @@ public class Dataretriever {
         try (Connection conn = connection.getConnection()) {
             PreparedStatement ps = conn.prepareStatement("""
                 select
-                    sum(case when vote_type = 'VALID' then 1 else 0 end) as valid,
-                    sum(case when vote_type = 'BLANK' then 1 else 0 end) as blank,
-                    sum(case when vote_type = 'NULL' then 1 else 0 end) as null
+                    count(case when vote_type = 'VALID' then 1 end) as valid,
+                    count(case when vote_type = 'BLANK' then 1 end) as blank,
+                    count(case when vote_type = 'NULL' then 1 end) as null
                 from vote;""");
 
             ResultSet rs = ps.executeQuery();
